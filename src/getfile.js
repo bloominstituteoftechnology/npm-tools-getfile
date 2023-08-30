@@ -5,19 +5,20 @@ const yargs = require('yargs')
 const usageMessage = 'Usage: node getfile [file]'
 const argError = 'Please provide a file argument'
 
-process.setUncaughtExceptionCaptureCallback(err => {
-  console.error(`Something bad happened! ${err}`)
-})
+module.exports = function (arg, options) {
+  if (options?.cli) { // being used from CLI
+    process.setUncaughtExceptionCaptureCallback(err => {
+      console.error(`Something bad happened! ${err}`)
+    })
+    const argv = yargs
+      .usage(usageMessage)
+      .demandCommand(1, argError)
+      .help('h')
+      .alias('h', 'help')
+      .argv
 
-module.exports = function () {
-  const argv = yargs
-    .usage(usageMessage)
-    .demandCommand(1, argError)
-    .help('h')
-    .alias('h', 'help')
-    .argv
-
-  const arg = argv._[0]
+    arg = argv._[0]
+  }
   const ext = upath.extname(arg)
   const absolutePath = upath.resolve(arg)
 
@@ -27,7 +28,7 @@ module.exports = function () {
   }
   if (!ext) {
     console.error(argError)
-    process.exit(1)
+    throw new Error(argError)
   }
   const directoryPath = upath.dirname(absolutePath)
   const filesInFolder = fs.readdirSync(directoryPath)
@@ -47,11 +48,12 @@ module.exports = function () {
         latestFile = file
       }
     })
-    const result = upath.join(directoryPath, latestFile)
-    console.log(result)
-    return result
+    const nextBestAbsolutePath = upath.join(directoryPath, latestFile)
+    console.log(nextBestAbsolutePath)
+    return nextBestAbsolutePath
   } else {
-    console.error(`No ${arg} or ${ext} files found in the folder`)
-    process.exit(1)
+    const error = `No ${arg} or ${ext} files found in the folder`
+    console.error(error)
+    throw new Error(error)
   }
 }

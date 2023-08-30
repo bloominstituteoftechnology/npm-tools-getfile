@@ -1,2 +1,6 @@
 #!/usr/bin/env node
-require('./src/getfile.js')()
+if (require.main === module) {
+  require('./src/getfile.js')(null, { cli: true })
+} else {
+  module.exports = require('./src/getfile.js')
+}
