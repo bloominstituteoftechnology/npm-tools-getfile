@@ -1,0 +1,22 @@
+{
+  "name": "@bloomtools/getfile",
+  "version": "0.0.1",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "node --inspect-brk index.js $1"
+  },
+  "author": "Gabriel Cabrejas <gabriel@cabrejas.net>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bloominstituteoftechnology/npm-tools-getfile.git"
+  },
+  "bin": "./index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "upath": "^2.0.1",
+    "yargs": "^17.7.2"
+  }
+}
