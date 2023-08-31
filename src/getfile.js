@@ -3,16 +3,23 @@ const upath = require('upath')
 const yargs = require('yargs')
 
 const usageMessage = 'Usage: node getfile [file]'
-const argError = 'Please provide a file argument'
+const argErrMessage = 'Please provide a file argument'
 
 module.exports = function (arg, options) {
-  if (options?.cli) { // being used from CLI
-    process.setUncaughtExceptionCaptureCallback(err => {
-      console.error(`Something bad happened! ${err}`)
-    })
+  const IS_CLI = options?.cli === true
+  const IS_MODULE = !IS_CLI
+
+  function handleResult(errorMessage, result) {
+    if (errorMessage && IS_MODULE) throw new Error(errorMessage)
+    if (errorMessage) console.error(errorMessage)
+    if (IS_MODULE) return result
+    console.log(result)
+  }
+
+  if (IS_CLI) {
     const argv = yargs
       .usage(usageMessage)
-      .demandCommand(1, argError)
+      .demandCommand(1, argErrMessage)
       .help('h')
       .alias('h', 'help')
       .argv
@@ -23,16 +30,15 @@ module.exports = function (arg, options) {
   const absolutePath = upath.resolve(arg)
 
   if (fs.existsSync(absolutePath)) {
-    console.log(absolutePath)
-    return absolutePath
+    return handleResult(null, absolutePath)
   }
   if (!ext) {
-    console.error(argError)
-    throw new Error(argError)
+    return handleResult(argErrMessage)
   }
   const directoryPath = upath.dirname(absolutePath)
   const filesInFolder = fs.readdirSync(directoryPath)
-  const filesOfType = filesInFolder.filter(file => upath.extname(file).toLowerCase() === ext.toLowerCase())
+  const filesOfType = filesInFolder
+    .filter(file => upath.extname(file).toLowerCase() === ext.toLowerCase())
 
   if (filesOfType.length > 0) {
     console.log(`Found files ${filesOfType.join(', ')}`)
@@ -49,11 +55,7 @@ module.exports = function (arg, options) {
       }
     })
     const nextBestAbsolutePath = upath.join(directoryPath, latestFile)
-    console.log(nextBestAbsolutePath)
-    return nextBestAbsolutePath
-  } else {
-    const error = `No ${arg} or ${ext} files found in the folder`
-    console.error(error)
-    throw new Error(error)
+    return handleResult(null, nextBestAbsolutePath)
   }
+  return handleResult(`No ${arg} or ${ext} files found in the folder`)
 }
