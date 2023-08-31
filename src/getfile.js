@@ -41,7 +41,7 @@ module.exports = function (arg, options) {
     .filter(file => upath.extname(file).toLowerCase() === ext.toLowerCase())
 
   if (filesOfType.length > 0) {
-    console.log(`Found files ${filesOfType.join(', ')}`)
+    IS_CLI && console.log(`Found files ${filesOfType.join(', ')}`)
     let latestFile = null
     let latestModificationTime = 0
 
