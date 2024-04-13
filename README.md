@@ -6,7 +6,7 @@ If the file does not exist, it returns the absolute path of the most recently mo
 
 ## ✨ Requirements
 
-1. Node >= 16.x
+1. Node >= 18.x
 2. Git Bash (Windows users)
 
 ## ✨ Usage
